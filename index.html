@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cesar Castillo Carrillo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cambria', 'Helvetica Neue', Arial, sans-serif;
+            background: #ffffff;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            border-bottom: 1px solid #e0e0e0;
+            z-index: 1000;
+            padding: 20px 0;
+        }
+
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .logo { width: 50px; height: 50px; }
+        .artist-name { font-size: 18px; font-weight: 400; letter-spacing: 0.5px; }
+        .nav-links { display: flex; gap: 35px; list-style: none; }
+        .nav-links a { text-decoration: none; color: #333; font-size: 15px; transition: opacity 0.3s; letter-spacing: 0.3px; }
+        .nav-links a:hover { opacity: 0.6; }
+
+        main { margin-top: 100px; min-height: calc(100vh - 100px); }
+        section { max-width: 1200px; margin: 0 auto; padding: 80px 40px; display: none; }
+        section.active { display: block; }
+
+        #home {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 200px);
+            text-align: center;
+        }
+        #home .logo { width: 200px; height: 200px; margin-bottom: 30px; }
+        #home h1 { font-size: 42px; font-weight: 300; margin-bottom: 15px; letter-spacing: 1px; }
+        #home p { font-size: 18px; color: #666; max-width: 600px; font-style: italic; }
+
+        .work-category { margin-bottom: 80px; }
+        .work-category h2 {
+            font-size: 28px;
+            font-weight: 300;
+            margin-bottom: 40px;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 15px;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        .project-item { cursor: pointer; transition: transform 0.3s; }
+        .project-item:hover { transform: translateY(-5px); }
+
+        .project-image {
+            width: 100%;
+            aspect-ratio: 4/3;
+            background: #f5f5f5;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ccc;
+            font-size: 14px;
+            overflow: hidden;
+        }
+        .project-image img { width: 100%; height: 100%; object-fit: cover; }
+
+        .project-info h3 { font-size: 18px; font-weight: 400; margin-bottom: 5px; }
+        .project-info p { font-size: 14px; color: #666; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+        .modal.active { display: block; }
+
+        .modal-content {
+    max-width: 95vw;
+    width: 1000px; 
+    margin: 40px auto;
+    padding: 30px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    background: #000;
+    border-radius: 8px;
+}
+
+        .modal-close {
+            position: fixed;
+            top: 30px;
+            right: 40px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 40px;
+            cursor: pointer;
+            z-index: 2001;
+            line-height: 1;
+            transition: opacity 0.3s;
+        }
+        .modal-close:hover { opacity: 0.6; }
+
+        .modal-header { color: white; margin-bottom: 40px; }
+        .modal-header h2 { font-size: 36px; font-weight: 300; margin-bottom: 10px; letter-spacing: 0.5px; }
+        .modal-header p { font-size: 16px; color: #ccc; }
+
+    .modal-gallery {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+        margin-bottom: 40px;
+        align-items: center;
+    }
+
+    .modal-gallery img {
+        max-width: 100%;
+        max-height: 70vh; /* Limita la altura al 70% de la ventana */
+        height: auto;
+        width: auto;
+        object-fit: contain; /* Mantiene proporciones y evita recortes */
+        background: #222;
+        border-radius: 4px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+
+        .modal-description { color: white; font-size: 16px; line-height: 1.8; max-width: 700px; }
+
+        .exhibitions-list { display: flex; flex-direction: column; gap: 15px; }
+        .exhibition-item { padding: 20px 0; border-bottom: 1px solid #f0f0f0; }
+        .exhibition-item h3 { font-size: 18px; font-weight: 400; margin-bottom: 5px; }
+        .exhibition-item p { font-size: 14px; color: #666; }
+
+        #about h2, #cv h2, #contact h2 { font-size: 32px; font-weight: 300; margin-bottom: 40px; letter-spacing: 0.5px; }
+        #about h3 { font-size: 22px; font-weight: 400; margin: 40px 0 20px; }
+        #about p { font-size: 16px; line-height: 1.8; color: #555; max-width: 800px; margin-bottom: 20px; }
+
+        .cv-section { margin-bottom: 50px; }
+        .cv-section h3 {
+            font-size: 22px;
+            font-weight: 400;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+        .cv-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; }
+        .cv-list { list-style: none; }
+        .cv-list li { margin-bottom: 20px; padding-left: 15px; border-left: 2px solid #f0f0f0; padding-left: 20px; }
+        .cv-list strong { display: block; font-weight: 400; margin-bottom: 3px; }
+        .cv-list span { font-size: 14px; color: #666; }
+
+        #contact {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 300px);
+            text-align: center;
+        }
+        .contact-info { display: flex; flex-direction: column; gap: 20px; font-size: 18px; }
+        .contact-info a { color: #333; text-decoration: none; transition: opacity 0.3s; }
+        .contact-info a:hover { opacity: 0.6; }
+
+        @media (max-width: 768px) {
+            nav { flex-direction: column; gap: 20px; }
+            .nav-links { gap: 20px; }
+            .projects-grid { grid-template-columns: 1fr; }
+            .cv-columns { grid-template-columns: 1fr; gap: 40px; }
+            #home h1 { font-size: 32px; }
+            .modal-content { margin: 40px 20px; padding: 20px; }
+            .modal-close { right: 20px; top: 20px; }
+            .modal-header h2 { font-size: 28px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="#" class="logo-container" onclick="showSection('home')">
+                <img src="images/logo.png" alt="César Castillo Logo" class="logo">
+                <span class="artist-name">César Castillo Carrillo</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="#" onclick="showSection('work')">Work</a></li>
+                <li><a href="#" onclick="showSection('about')">About</a></li>
+                <li><a href="#" onclick="showSection('cv')">CV</a></li>
+                <li><a href="#" onclick="showSection('contact')">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="home" class="active">
+            <img src="images/logo.png" alt="César Castillo Logo" class="logo">
+            <h1>Cesar Castillo Carrillo</h1>
+            <p>Cuerpos disidentes como imagen</p>
+        </section>
+
+        <section id="work">
+            <div class="work-category">
+                <h2>Proyectos</h2>
+                <div class="projects-grid">
+                    <div class="project-item" onclick="openModal('surco')">
+                        <div class="project-image">
+                            <img src="images/proyectos/surco-1.png" alt="Surco y línea" onerror="this.parentElement.innerHTML='[Imagen]'">
+                        </div>
+                        <div class="project-info">
+                            <h3>Surco y línea</h3>
+                            <p>Instalación, 2025</p>
+                        </div>
+                    </div>
+
+                    <div class="project-item" onclick="openModal('energia-movimiento')">
+                        <div class="project-image">
+                            <img src="images/proyectos/energia-movimiento-1.png" alt="Energía en movimiento" onerror="this.parentElement.innerHTML='[Imagen]'">
+                        </div>
+                        <div class="project-info">
+                            <h3>Energía en movimiento</h3>
+                            <p>Performance, 2024</p>
+                        </div>
+                    </div>
+
+                    <div class="project-item" onclick="openModal('proporcion')">
+                        <div class="project-image">
+                            <img src="images/proyectos/proporcion-1.png" alt="Un problema de proporción" onerror="this.parentElement.innerHTML='[Imagen]'">
+                        </div>
+                        <div class="project-info">
+                            <h3>Un problema de proporción</h3>
+                            <p>Acrílico sobre tela, 2024</p>
+                        </div>
+                    </div>
+
+                    <div class="project-item" onclick="openModal('dientes')">
+                        <div class="project-image">
+                            <img src="images/proyectos/dientes-1.jpg" alt="Dientes" onerror="this.parentElement.innerHTML='[Imagen]'">
+                        </div>
+                        <div class="project-info">
+                            <h3>Dientes, una máquina de impresión</h3>
+                            <p>Instalación, 2024</p>
+                        </div>
+                    </div>
+
+                    <div class="project-item" onclick="openModal('energia-simetrica')">
+                        <div class="project-image">
+                            <img src="images/proyectos/energia-simetrica-1.jpg" alt="Energía simétrica" onerror="this.parentElement.innerHTML='[Imagen]'">
+                        </div>
+                        <div class="project-info">
+                            <h3>Energía simétrica</h3>
+                            <p>Performance, 2023</p>
+                        </div>
+                    </div>
+
+                    <div class="project-item" onclick="openModal('artes-marciales')">
+                        <div class="project-image">
+                            <img src="images/proyectos/artes-marciales-1.jpg" alt="Artes Marciales Gráficas" onerror="this.parentElement.innerHTML='[Imagen]'">
+                        </div>
+                        <div class="project-info">
+                            <h3>Artes Marciales Gráficas</h3>
+                            <p>Exposición Individual, 2023</p>
+                        </div>
+                    </div>
+
+                    <div class="project-item" onclick="openModal('circulos')">
+                        <div class="project-image">
+                            <img src="images/proyectos/circulos-1.jpg" alt="Una máquina de círculos" onerror="this.parentElement.innerHTML='[Imagen]'">
+                        </div>
+                        <div class="project-info">
+                            <h3>Una máquina de círculos</h3>
+                            <p>Instalación, 2021</p>
+                        </div>
+                    </div>
+
+                    <div class="project-item" onclick="openModal('morder')">
+                        <div class="project-image">
+                            <img src="images/proyectos/morder-1.jpg" alt="Morder la propia carne" onerror="this.parentElement.innerHTML='[Imagen]'">
+                        </div>
+                        <div class="project-info">
+                            <h3>Morder la propia carne</h3>
+                            <p>Mural, 2016</p>
+                        </div>
+                    </div>
+
+                    <div class="project-item" onclick="openModal('maquina-tiempo')">
+                        <div class="project-image">
+                            <img src="images/proyectos/maquina-tiempo-1.jpg" alt="Máquina del tiempo" onerror="this.parentElement.innerHTML='[Imagen]'">
+                        </div>
+                        <div class="project-info">
+                            <h3>Máquina del tiempo</h3>
+                            <p>Performance, 2014</p>
+                        </div>
+                    </div>
+
+                    <div class="project-item" onclick="openModal('delirio')">
+                        <div class="project-image">
+                            <img src="images/proyectos/delirio-1.jpg" alt="Delirio" onerror="this.parentElement.innerHTML='[Imagen]'">
+                        </div>
+                        <div class="project-info">
+                            <h3>Delirio</h3>
+                            <p>Mural, 2014</p>
+                        </div>
+                    </div>
+
+                    <div class="project-item" onclick="openModal('flor-junio')">
+                        <div class="project-image">
+                            <img src="images/proyectos/flor-junio-1.jpg" alt="Flor de Junio" onerror="this.parentElement.innerHTML='[Imagen]'">
+                        </div>
+                        <div class="project-info">
+                            <h3>Flor de Junio</h3>
+                            <p>Instalación, 2013</p>
+                        </div>
+                    </div>
+
+                    <div class="project-item" onclick="openModal('parque-mexico')">
+                        <div class="project-image">
+                            <img src="images/proyectos/parque-mexico-1.jpg" alt="Parque México" onerror="this.parentElement.innerHTML='[Imagen]'">
+                        </div>
+                        <div class="project-info">
+                            <h3>Parque México</h3>
+                            <p>Registro de acción, 2011</p>
+                        </div>
+                    </div>
+
+                    <div class="project-item" onclick="openModal('osmosis')">
+                        <div class="project-image">
+                            <img src="images/proyectos/osmosis-1.jpg" alt="Ósmosis" onerror="this.parentElement.innerHTML='[Imagen]'">
+                        </div>
+                        <div class="project-info">
+                            <h3>Ósmosis</h3>
+                            <p>Instalación, 2009</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="work-category">
+                <h2>Exposiciones Individuales</h2>
+                <div class="exhibitions-list">
+                    <div class="exhibition-item">
+                        <h3>"Dragón de Offset"</h3>
+                        <p>MUPAG, Guadalajara, 2025</p>
+                    </div>
+                    <div class="exhibition-item">
+                        <h3>"Energía en momento"</h3>
+                        <p>Edificio Arronis, Guadalajara, 2023</p>
+                    </div>
+                    <div class="exhibition-item">
+                        <h3>"Artes Marciales Gráficas"</h3>
+                        <p>Impronta Casa Editora, Guadalajara, 2023</p>
+                    </div>
+                    <div class="exhibition-item">
+                        <h3>"Hasta las últimas consecuencias"</h3>
+                        <p>Impronta Casa Editora, Guadalajara, 2015</p>
+                    </div>
+                    <div class="exhibition-item">
+                        <h3>"Delirio"</h3>
+                        <p>TRAMA CENTRO, Guadalajara, 2014</p>
+                    </div>
+                    <div class="exhibition-item">
+                        <h3>"Parque México"</h3>
+                        <p>Plataforma, Arte Contemporáneo, Guadalajara, 2011</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="work-category">
+                <h2>Exposiciones Colectivas</h2>
+                <div class="exhibitions-list">
+                    <div class="exhibition-item">
+                        <h3>"Tierras Melancólicas"</h3>
+                        <p>Guadalajara 90210, Guadalajara, Jalisco, 2025</p>
+                    </div>
+                    <div class="exhibition-item">
+                        <h3>"Algo corto"</h3>
+                        <p>Torre Andrade, León, Guanajuato, 2024</p>
+                    </div>
+                    <div class="exhibition-item">
+                        <h3>"Tiempo libre"</h3>
+                        <p>Impronta casa editora, Guadalajara, Jalisco, 2024</p>
+                    </div>
+                    <div class="exhibition-item">
+                        <h3>"Flores en el muro"</h3>
+                        <p>Museo Raúl Anguiano, Guadalajara, Jalisco, 2024</p>
+                    </div>
+                    <div class="exhibition-item">
+                        <h3>"De punto A a punto C"</h3>
+                        <p>Galería Liliput, Puebla, 2022</p>
+                    </div>
+                    <div class="exhibition-item">
+                        <h3>"Arar la tierra"</h3>
+                        <p>Impronta Casa Editora, Guadalajara, Jalisco, 2021</p>
+                    </div>
+                    <div class="exhibition-item">
+                        <h3>"Catarsis"</h3>
+                        <p>Galería Jesús Gallardo, León, Guanajuato, 2020</p>
+                    </div>
+                    <div class="exhibition-item">
+                        <h3>"Notas de lo irreal"</h3>
+                        <p>Sala Juárez, Guadalajara, Jalisco, 2019</p>
+                    </div>
+                    <div class="exhibition-item">
+                        <h3>"Actos deliberados"</h3>
+                        <p>Otro espacio, Guadalajara, Jalisco, 2018</p>
+                    </div>
+                    <div class="exhibition-item">
+                        <h3>"Reconstrucción de la imagen"</h3>
+                        <p>Museo de la Ciudad, Guadalajara, Jalisco, 2017</p>
+                    </div>
+                    <div class="exhibition-item">
+                        <h3>"Reconstrucción, un proyecto de Abraham Cruzvillegas"</h3>
+                        <p>Museo de Arte de Zapopan, Zapopan, Jalisco, 2016</p>
+                    </div>
+                    <div class="exhibition-item">
+                        <h3>"Salón de Octubre"</h3>
+                        <p>Ex Convento del Carmen, Guadalajara, Jalisco, 2016</p>
+                    </div>
+                    <div class="exhibition-item">
+                        <h3>"Máquina del tiempo"</h3>
+                        <p>Museo de Arte de Zapopan, Zapopan, Jalisco, 2014</p>
+                    </div>
+                    <div class="exhibition-item">
+                        <h3>"Usted está aquí"</h3>
+                        <p>Museo de la Ciudad, Guadalajara, Jalisco, 2014</p>
+                    </div>
+                    <div class="exhibition-item">
+                        <h3>"Casa de la Cultura"</h3>
+                        <p>Galería Juan Soriano, Guadalajara, Jalisco, 2013</p>
+                    </div>
+                    <div class="exhibition-item">
+                        <h3>"Irrigación"</h3>
+                        <p>Alianza Francesa, Guadalajara, Jalisco, 2012</p>
+                    </div>
+                    <div class="exhibition-item">
+                        <h3>"Línea de salida"</h3>
+                        <p>TRAMA Centro, Guadalajara, Jalisco, 2009</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about">
+            <h2>About</h2>
+            <h3>Cuerpos disidentes como imagen (statement)</h3>
+            <p>Mi exploración artística se encuentra entre performance e imagen. Crear una imagen a partir de un cuerpo y la gráfica implica explorar la abstracción como un concepto central, donde la repetición no solo es un elemento visual, sino también una metáfora poderosa de la persistencia y la resistencia.</p>
+            <h3>Semblanza</h3>
+            <p>La producción de Cesar Castillo Inicia en 2008 a la edad de 20 años. Comenzó su formación en la Escuela de Artes Plásticas en la Universidad de Guadalajara, donde posteriormente concluyó la licenciatura en Diseño Industrial.</p>
+            <p>Al tiempo que asiste a diversos cursos y talleres con artistas nacionales. A través de su práctica examina los procesos cognitivos del ser humano, siendo el dibujo la exploración más recurrente; los soportes en donde trabaja van desde los muros, hasta los polímeros.</p>
+            <p>Su trabajo se ha expuesto en diferentes ciudades de México. Ha participado en veintidós exposiciones colectivas y cuatro exposiciones individuales.</p>
+        </section>
+
+        <section id="cv">
+            <h2>Curriculum Vitae</h2>
+            <div class="cv-section">
+                <h3>Formación</h3>
+                <ul class="cv-list">
+                    <li><strong>Licenciatura en Diseño Industrial</strong><span>Universidad de Guadalajara</span></li>
+                    <li><strong>Escuela de Artes Plásticas</strong><span>Universidad de Guadalajara</span></li>
+                    <li><strong>Cursos y talleres</strong><span>Con diversos artistas nacionales</span></li>
+                </ul>
+            </div>
+            <div class="cv-section">
+                <h3>Exposiciones</h3>
+                <div class="cv-columns">
+                    <div>
+                        <h4 style="font-size: 18px; margin-bottom: 20px; color: #666;">Individuales</h4>
+                        <ul class="cv-list">
+                            <li><strong>"Dragón de Offset"</strong><span>MUPAG, Guadalajara, 2025</span></li>
+                            <li><strong>"Energía en momento"</strong><span>Edificio Arronis, Guadalajara, 2023</span></li>
+                            <li><strong>"Artes Marciales Gráficas"</strong><span>Impronta Casa Editora, Guadalajara, 2023</span></li>
+                            <li><strong>"Hasta las últimas consecuencias"</strong><span>Impronta Casa Editora, Guadalajara, 2015</span></li>
+                            <li><strong>"Delirio"</strong><span>TRAMA CENTRO, Guadalajara, 2014</span></li>
+                            <li><strong>"Parque México"</strong><span>Plataforma, Arte Contemporáneo, Guadalajara, 2011</span></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 style="font-size: 18px; margin-bottom: 20px; color: #666;">Colectivas (selección)</h4>
+                        <ul class="cv-list">
+                            <li><strong>"Tierras Melancólicas"</strong><span>Guadalajara 90210, 2025</span></li>
+                            <li><strong>"Algo corto"</strong><span>Torre Andrade, León, 2024</span></li>
+                            <li><strong>"Flores en el muro"</strong><span>Museo Raúl Anguiano, 2024</span></li>
+                            <li><strong>"Catarsis"</strong><span>Galería Jesús Gallardo, León, 2020</span></li>
+                            <li><strong>"Reconstrucción"</strong><span>Museo de Arte de Zapopan, 2016</span></li>
+                            <li><strong>"Salón de Octubre"</strong><span>Ex Convento del Carmen, 2016</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact">
+            <h2>Contact</h2>
+            <div class="contact-info">
+                <a href="https://instagram.com/cesardedetener" target="_blank">@cesardedetener</a>
+                <a href="mailto:cesar.castillo.carrillo@gmail.com">cesar.castillo.carrillo@gmail.com</a>
+            </div>
+        </section>
+    </main>
+
+    <div id="projectModal" class="modal">
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle"></h2>
+                <p id="modalSubtitle"></p>
+            </div>
+            <div class="modal-gallery" id="modalGallery"></div>
+            <div class="modal-description" id="modalDescription"></div>
+        </div>
+    </div>
+
+    <script>
+        const projects = {
+            'surco': {
+                title: "Surco y línea",
+                subtitle: "Instalación, 2025",
+                images: ["images/proyectos/surco-1.png"],
+                description: ""
+            },
+            'energia-movimiento': {
+                title: "Energía en movimiento",
+                subtitle: "Performance - Kata de artes marciales delante de biombo de espejos deformados, 2024",
+                images: ["images/proyectos/energia-movimiento-1.png"],
+                description: ""
+            },
+            'proporcion': {
+                title: "Un problema de proporción",
+                subtitle: "Acrílico sobre tela, 160cm x 120cm c/u, 2024",
+                images: ["images/proyectos/proporcion-1.png", "images/proyectos/proporcion-2.png"],
+                
+                description: ""
+            },
+            'dientes': {
+                title: "Dientes, una máquina de impresión",
+                subtitle: "Instalación - Lápices mordidos, 2024",
+                images: ["images/proyectos/dientes-1.jpg"],
+                description: ""
+            },
+            'energia-simetrica': {
+                title: "Energía simétrica",
+                subtitle: "Performance, 2023",
+                images: ["images/proyectos/energia-simetrica-1.jpg"],
+                description: ""
+            },
+            'artes-marciales': {
+                title: "Artes Marciales Gráficas",
+                subtitle: "Exposición Individual, 2023",
+                images: ["images/proyectos/artes-marciales-1.jpg"],
+                description: ""
+            },
+            'circulos': {
+                title: "Una máquina de círculos",
+                subtitle: "Instalación - Video digital, estampas en papel algodón y máquina, 2021",
+                images: ["images/proyectos/circulos-1.jpg"],
+                description: ""
+            },
+            'morder': {
+                title: "Morder la propia carne",
+                subtitle: "Mural - Registro de la acción de morderse los brazos y estampar con sangre, 2016",
+                images: ["images/proyectos/morder-1.jpg", "images/proyectos/morder-2.jpg", "images/proyectos/morder-3.jpg"],
+                description: ""
+            },
+            'maquina-tiempo': {
+                title: "Máquina del tiempo",
+                subtitle: "Registro del performance, 2014 (Colaboración con Claudia Cisneros y Sara García)",
+                images: ["images/proyectos/maquina-tiempo-1.jpg"],
+                description: ""
+            },
+            'delirio': {
+                title: "Delirio",
+                subtitle: "Mural - Registro del dibujar por un mes en una habitación, 2014",
+                images: ["images/proyectos/delirio-1.jpg"],
+                description: ""
+            },
+            'flor-junio': {
+                title: "Flor de Junio",
+                subtitle: "Instalación, 2013",
+                images: ["images/proyectos/flor-junio-1.jpg"],
+                description: ""
+            },
+            'parque-mexico': {
+                title: "Parque México",
+                subtitle: "Registro de la acción de buscar a Francis Alÿs por 15 días, 2011 (Colaboración con Luisa Fernanda Gutierrez)",
+                images: ["images/proyectos/parque-mexico-1.jpg"],
+                description: ""
+            },
+            'osmosis': {
+                title: "Ósmosis",
+                subtitle: "Instalación - Acción de arrojar un libro de Vicente Rojo sobre una pared, 2009",
+                images: ["images/proyectos/osmosis-1.jpg"],
+                description: ""
+            }
+        };
+        
+        function showSection(id) {
+            document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            window.scrollTo(0, 0);
+            return false;
+        }
+
+        function openModal(projectId) {
+            const project = projects[projectId];
+            if (!project) return;
+            document.getElementById('modalTitle').textContent = project.title;
+            document.getElementById('modalSubtitle').textContent = project.subtitle;
+            document.getElementById('modalDescription').textContent = project.description;
+            const gallery = document.getElementById('modalGallery');
+            gallery.innerHTML = '';
+            project.images.forEach(src => {
+                const img = document.createElement('img');
+                img.src = src;
+                img.alt = project.title;
+                img.onerror = () => img.style.display = 'none';
+                gallery.appendChild(img);
+            });
+            document.getElementById('projectModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('projectModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        document.getElementById('projectModal').addEventListener('click', e => {
+            if (e.target.id === 'projectModal') closeModal();
+        });
+    </script>
+</body>
+</html>
